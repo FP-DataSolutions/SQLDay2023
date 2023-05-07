@@ -29,8 +29,12 @@ class KeywordExtractionModel(mlflow.pyfunc.PythonModel):
         model_input = model_input.iloc[:,0]
         entities = kw_model.extract_keywords(model_input.to_list(), keyphrase_ngram_range=(1,2))
         keys = ['entity', 'score']
-        entities_struct = [[dict(zip(keys,values)) for values in records] for records in entities]
-        entities_str = [re.sub(r"[\[\]]+",'',str(tweet)) for tweet in entities_struct]
+        if type(entities[0]) == list:
+            entities_struct = [[dict(zip(keys,values)) for values in records] for records in entities]
+            entities_str = [re.sub(r"[\[\]]+",'',str(tweet)) for tweet in entities_struct]
+        elif type(entities[0]) == tuple:
+            entities_struct = [[dict(zip(keys,values)) for values in entities]]
+            entities_str = [re.sub(r"[\[\]]+",'',str(tweet)) for tweet in entities_struct]
         return pd.Series(entities_str)
 
 # COMMAND ----------
@@ -61,7 +65,7 @@ display(df_small.withColumn('keywords',loaded_model(df_small.text)))
 # MAGIC   WHERE
 # MAGIC     lang='en'
 # MAGIC )
-# MAGIC SELECT 
+# MAGIC SELECT
 # MAGIC   twitter_query,
 # MAGIC   text,
 # MAGIC   from_json(concat(keywords,'}'), 'entity STRING, score FLOAT').entity AS entity, 
@@ -82,7 +86,7 @@ client.update_registered_model(
 client.update_model_version(
     name=model_details.name,
     version=model_details.version,
-    description="This is a tested ona a small set and first working version of the keyword extraction model"
+    description="Patch for 1-dimensional inputs"
 )
 
 client.set_tag(run.info.run_id, key="db_table", value="fpds.fpds_json_data")

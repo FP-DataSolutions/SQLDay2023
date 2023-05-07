@@ -30,6 +30,7 @@ place_fields_all = 'contained_within,country,country_code,full_name,geo,id,name,
 # COMMAND ----------
 
 query = dbutils.widgets.get("Twitter search query")
+query_tw = '#snowflakedb OR snowflake data' if query=='snowflakedb' else query
 next_token_exists = True
 next_token = None
 max_id_path = f"/dbfs/mnt/data/twitter_real_time/{query}/_max_id.txt"
@@ -45,7 +46,7 @@ json_includes = []
 # COMMAND ----------
 
 while next_token_exists:
-    response = client.search_recent_tweets(query + " -is:retweet",
+    response = client.search_recent_tweets(query_tw + " -is:retweet",
                                            tweet_fields = tweet_fields_all, 
                                            user_fields = user_fields_all, 
                                            place_fields = place_fields_all, 
