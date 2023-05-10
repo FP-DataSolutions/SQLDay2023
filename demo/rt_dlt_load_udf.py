@@ -38,7 +38,7 @@ spark.udf.register("general_classification", classifier_udf_reg)
 # COMMAND ----------
 
 #Load the keywords extractor
-pyfunc_keywords_udf =  mlflow.pyfunc.spark_udf(spark, model_uri="models:/pyfunc_keyword_extraction/Production", result_type=StringType())
+pyfunc_keywords_udf =  mlflow.pyfunc.spark_udf(spark, model_uri="models:/pyfunc_keyword_extraction/Staging", result_type=StringType())
 spark.udf.register("general_keywords_extraction", pyfunc_keywords_udf)
 
 # COMMAND ----------

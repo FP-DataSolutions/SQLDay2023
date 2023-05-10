@@ -9,6 +9,7 @@ import re
 
 from keybert import KeyBERT
 from pyspark.sql.types import StringType
+from transformers.pipelines import pipeline
 
 # COMMAND ----------
 
@@ -25,7 +26,8 @@ class KeywordExtractionModel(mlflow.pyfunc.PythonModel):
         return self.keyword_extraction(model_input)
 
     def keyword_extraction(self, model_input):
-        kw_model = KeyBERT()
+        hf_model = pipeline("feature-extraction", model="DataikuNLP/paraphrase-albert-small-v2")
+        kw_model = KeyBERT(model=hf_model)
         model_input = model_input.iloc[:,0]
         entities = kw_model.extract_keywords(model_input.to_list(), keyphrase_ngram_range=(1,2))
         keys = ['entity', 'score']
@@ -86,7 +88,7 @@ client.update_registered_model(
 client.update_model_version(
     name=model_details.name,
     version=model_details.version,
-    description="Patch for 1-dimensional inputs"
+    description="Patch for failed sentence-transformers module"
 )
 
 client.set_tag(run.info.run_id, key="db_table", value="fpds.fpds_json_data")
@@ -95,5 +97,5 @@ client.set_tag(run.info.run_id, key="db_table", value="fpds.fpds_json_data")
 client.transition_model_version_stage(
     name=model_details.name,
     version=model_details.version,
-    stage='production'
+    stage='staging'
 )

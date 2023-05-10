@@ -1,8 +1,8 @@
 -- Databricks notebook source
 CREATE TEMPORARY STREAMING LIVE VIEW raw_tucker_json_data AS
-SELECT *, 'databricks' AS twitter_query FROM cloud_files("dbfs:/mnt/data/twitter/databricks/data/","json",map("cloudFiles.inferColumnTypes", "true"))
+SELECT *, 'databricks' AS twitter_query FROM cloud_files("dbfs:/mnt/data/twitter_real_time/databricks/data/","json",map("cloudFiles.inferColumnTypes", "true"))
 UNION ALL
-SELECT *, 'snowflake' AS twitter_query FROM cloud_files("dbfs:/mnt/data/twitter/snowflakedb/data/","json",map("cloudFiles.inferColumnTypes", "true"))
+SELECT *, 'snowflake' AS twitter_query FROM cloud_files("dbfs:/mnt/data/twitter_real_time/snowflakedb/data/","json",map("cloudFiles.inferColumnTypes", "true"))
 
 -- COMMAND ----------
 
